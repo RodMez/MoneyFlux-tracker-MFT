@@ -172,28 +172,116 @@ CREATE TABLE IF NOT EXISTS Recordatorio (
 
 ### **3. Hoja de Ruta de Mejoras Futuras (v2.0 y Posteriores)**
 
-Esta sección describe funcionalidades potenciales que pueden ser implementadas en futuras versiones para enriquecer la aplicación.
+De acuerdo. Dejando a un lado la optimización de rendimiento con índices, y partiendo de la base de que tu esquema actual es excelente y funcional, podemos enfocar el análisis en **posibles mejoras evolutivas**.
 
-#### **Mejora 1: Unificar `Movimiento` y `Transaccion`**
+Estas no son correcciones de errores (porque no los hay), sino **ideas para futuras versiones de tu aplicación** que añadirían funcionalidades más potentes y harían tu modelo aún más flexible y completo.
 
-- **Oportunidad:** Simplificar la consulta del historial completo de actividades financieras en una sola vista cronológica.
-- **Solución Propuesta:** Fusionar ambas tablas en una sola tabla `Operacion` con un campo `tipo ENUM('Ingreso', 'Gasto', 'Transferencia')`.
-- **Beneficio:** Facilita la lógica de la aplicación para generar reportes y vistas de "estado de cuenta" unificadas.
+Aquí tienes un análisis profundo con posibles mejoras para "MoneyFluxTracker v2.0":
 
-#### **Mejora 2: Automatización de Movimientos Recurrentes**
+---
 
-- **Oportunidad:** Automatizar el registro de ingresos y gastos fijos (salarios, arriendos, suscripciones) para reducir la entrada manual de datos.
-- **Solución Propuesta:** Crear una tabla `MovimientoRecurrente` que defina la frecuencia y el monto. Un proceso automático (cron job) registraría las operaciones en la tabla `Movimiento` en las fechas correspondientes.
-- **Beneficio:** Aumenta la precisión, ahorra tiempo al usuario y permite proyecciones financieras más exactas.
+### **Análisis de Mejoras Potenciales (Evolución del Modelo)**
 
-#### **Mejora 3: Sistema de Presupuestos (Budgeting)**
+#### **Mejora 1: Fusionar `Movimiento` y `Transaccion` en una tabla `Operacion`**
 
-- **Oportunidad:** Pasar de un seguimiento reactivo a una planificación proactiva, permitiendo al usuario fijar límites de gasto por categoría.
-- **Solución Propuesta:** Crear una tabla `Presupuesto` que relacione una `categoria_id` con un `monto_limite` para un periodo de tiempo definido.
-- **Beneficio:** Es una herramienta de control financiero muy poderosa que fomenta directamente la creación de buenos hábitos.
+*   **El "Porqué":** Actualmente tienes una separación limpia entre movimientos (que alteran tu patrimonio) y transacciones (que solo mueven dinero entre cuentas). Esto es bueno, pero tiene una desventaja: si quieres ver un historial cronológico completo de *toda* tu actividad financiera (gastos, ingresos y transferencias), necesitas consultar dos tablas y unir los resultados. Una tabla unificada simplificaría drásticamente los reportes y la visualización de la línea de tiempo.
 
-#### **Mejora 4: Modelado Detallado de Deudas y Activos**
+*   **La Implementación:**
+    *   Crear una única tabla llamada `Operacion`.
+    *   Añadir una columna `tipo ENUM('Ingreso', 'Gasto', 'Transferencia')`.
+    *   La tabla tendría `cuenta_id` (para ingresos/gastos) y `cuenta_destino_id` (que sería `NULL` para ingresos/gastos, pero contendría el ID de la cuenta de destino para las transferencias).
+    *   `categoria_id` sería `NULL` para las operaciones de tipo 'Transferencia'.
 
-- **Oportunidad:** Obtener una visión completa del patrimonio neto del usuario, considerando no solo el flujo de dinero, sino también el valor de sus deudas y activos.
-- **Solución Propuesta:** Crear tablas especializadas como `Deuda` (con campos para saldo pendiente, interés, etc.) y `ActivoInversion` (con campos para valor de compra, valor actual, etc.).
-- **Beneficio:** Prepara la aplicación para la gestión de inversiones y proporciona la métrica financiera más importante: el patrimonio neto real (Activos - Deudas).
+*   **Ventaja:** Simplifica la lógica de la aplicación para obtener un "estado de cuenta" o historial unificado. Una sola consulta para obtener toda la actividad.
+
+---
+
+#### **Mejora 2: Modelar Explícitamente los Movimientos Recurrentes**
+
+*   **El "Porqué":** Tu tabla `Recordatorio` es genial para alertarte de que debes hacer un pago. Sin embargo, no automatiza el registro. Las mejores apps financieras permiten definir gastos o ingresos fijos (el arriendo, el salario, la cuota de la moto) y los registran automáticamente cada mes. Esto es clave para desarrollar buenos hábitos y tener una previsión financiera real.
+
+*   **La Implementación:**
+    *   Crear una nueva tabla `MovimientoRecurrente`.
+    *   Campos: `id`, `usuario_id`, `cuenta_id`, `categoria_id`, `monto`, `descripcion`, `frecuencia ENUM('Diaria', 'Semanal', 'Quincenal', 'Mensual')`, `fecha_inicio`, `fecha_fin` (opcional).
+    *   Tu aplicación tendría un proceso (un "cron job" o tarea programada) que cada día revisa esta tabla y crea los registros correspondientes en la tabla `Movimiento`.
+
+*   **Ventaja:** Automatiza gran parte de la entrada de datos, reduce el error humano y permite hacer proyecciones de flujo de caja a futuro con gran precisión.
+
+---
+
+#### **Mejora 3: Implementar un Sistema de Presupuestos (`Budgeting`)**
+
+*   **El "Porqué":** Las metas de ahorro (`Meta`) son para un objetivo específico. Pero para el control del día a día, la herramienta más poderosa es un presupuesto. Te permite definir un límite de gasto por categoría para un periodo (ej: "No gastar más de $300.000 en 'Comida' este mes"). Esto ataca directamente tu objetivo de "desarrollar buenos hábitos financieros".
+
+*   **La Implementación:**
+    *   Crear una nueva tabla `Presupuesto`.
+    *   Campos: `id`, `usuario_id`, `categoria_id` (para presupuestar por categoría), `monto_limite DECIMAL(15,2)`, `periodo ENUM('Semanal', 'Mensual', 'Anual')`, `fecha_inicio`.
+    *   La aplicación podría entonces mostrarte barras de progreso de tus presupuestos, comparando el total de gastos de una categoría contra el límite que estableciste.
+
+*   **Ventaja:** Transforma tu app de ser un simple rastreador de gastos a ser una herramienta proactiva de planificación y control financiero.
+
+---
+
+#### **Mejora 4: Modelar Deudas y Activos de Inversión de Forma Detallada**
+
+*   **El "Porqué":** En tu descripción inicial mencionaste préstamos. Un préstamo es más que un simple gasto mensual (`la cuota de $181.000`). Es una deuda con un monto total, un saldo pendiente y, posiblemente, una tasa de interés. Lo mismo ocurrirá cuando empieces a invertir. Un activo tiene un valor que fluctúa. El esquema actual no captura esta complejidad.
+
+*   **La Implementación:**
+    *   Crear una tabla `Deuda`:
+        *   Campos: `id`, `usuario_id`, `nombre` (ej: "Préstamo Moto"), `monto_total`, `saldo_pendiente`, `tasa_interes`, `fecha_adquisicion`. Cada pago en `Movimiento` reduciría el `saldo_pendiente`.
+    *   Crear una tabla `ActivoInversion`:
+        *   Campos: `id`, `usuario_id`, `nombre` (ej: "Acciones Ecopetrol"), `tipo` (ej: 'Acciones', 'Cripto'), `valor_compra`, `valor_actual`, `cantidad`.
+
+*   **Ventaja:** Permite calcular tu **patrimonio neto real** (Activos - Deudas), una métrica financiera fundamental. Prepara tu aplicación para tu objetivo a largo plazo de gestionar inversiones.
+
+
+
+
+
+## v1.5 - Unificación de Movimientos y Transacciones: Tabla `Operacion`
+
+### **Resumen del Cambio**
+Se introduce la tabla central `Operacion`, que reemplaza a las tablas `Movimiento` y `Transaccion`.  
+Esto permite registrar todas las actividades financieras (ingresos, gastos y transferencias) en una sola tabla, facilitando la consulta y el análisis.
+
+### **Estructura de la Tabla `Operacion`**
+
+| Campo              | Tipo                              | Descripción                                                                 |
+|--------------------|-----------------------------------|-----------------------------------------------------------------------------|
+| id                 | INT, PK, AUTO_INCREMENT           | Identificador único de la operación                                         |
+| usuario_id         | INT, FK                           | Usuario propietario de la operación                                         |
+| tipo               | ENUM('Ingreso','Gasto','Transferencia') | Tipo de operación                                                          |
+| monto              | DECIMAL(15,2)                     | Monto de la operación                                                      |
+| fecha_hora         | DATETIME                          | Fecha y hora de la operación                                               |
+| descripcion        | TEXT                              | Descripción opcional                                                       |
+| categoria_id       | INT, FK, NULLABLE                 | Categoría (solo para Ingreso y Gasto)                                      |
+| cuenta_origen_id   | INT, FK, NULLABLE                 | Cuenta de origen (ver reglas abajo)                                        |
+| cuenta_destino_id  | INT, FK, NULLABLE                 | Cuenta de destino (ver reglas abajo)                                       |
+
+### **Reglas según el tipo de operación**
+
+- **Ingreso:**  
+  - `cuenta_origen_id` = NULL  
+  - `cuenta_destino_id` = cuenta que recibe el dinero  
+  - `categoria_id` = obligatoria
+
+- **Gasto:**  
+  - `cuenta_origen_id` = cuenta de la que sale el dinero  
+  - `cuenta_destino_id` = NULL  
+  - `categoria_id` = obligatoria
+
+- **Transferencia:**  
+  - `cuenta_origen_id` = cuenta de origen  
+  - `cuenta_destino_id` = cuenta de destino  
+  - `categoria_id` = NULL
+
+### **Ejemplo de consulta para historial financiero**
+
+```sql
+SELECT * FROM Operacion WHERE usuario_id = ? ORDER BY fecha_hora DESC;
+```
+
+### **Ventajas de este modelo**
+- Historial unificado y ordenado.
+- Menos tablas y lógica más simple.
+- Integridad garantizada por restricciones CHECK.

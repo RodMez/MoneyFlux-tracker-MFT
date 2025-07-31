@@ -40,35 +40,31 @@ CREATE TABLE IF NOT EXISTS Categoria (
 );
 
 -- -----------------------------------------------------
--- Tabla Movimiento
+-- Tabla Operacion (reemplaza Movimiento y Transaccion)
 -- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS Movimiento (
+CREATE TABLE IF NOT EXISTS Operacion (
   id INT PRIMARY KEY AUTO_INCREMENT,
   usuario_id INT NOT NULL,
-  cuenta_id INT NOT NULL,
-  categoria_id INT NOT NULL,
-  fecha_hora DATETIME NOT NULL,
+  tipo ENUM('Ingreso', 'Gasto', 'Transferencia') NOT NULL,
   monto DECIMAL(15, 2) NOT NULL,
-  descripcion TEXT,
-  FOREIGN KEY (usuario_id) REFERENCES Usuario(id) ON DELETE CASCADE,
-  FOREIGN KEY (cuenta_id) REFERENCES Cuenta(id),
-  FOREIGN KEY (categoria_id) REFERENCES Categoria(id)
-);
-
--- -----------------------------------------------------
--- Tabla Transaccion
--- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS Transaccion (
-  id INT PRIMARY KEY AUTO_INCREMENT,
-  usuario_id INT NOT NULL,
-  cuenta_origen_id INT NOT NULL,
-  cuenta_destino_id INT NOT NULL,
   fecha_hora DATETIME NOT NULL,
-  monto DECIMAL(15, 2) NOT NULL,
-  descripcion TEXT,
+  descripcion TEXT NULL,
+  categoria_id INT NULL,
+  cuenta_origen_id INT NULL,
+  cuenta_destino_id INT NULL,
   FOREIGN KEY (usuario_id) REFERENCES Usuario(id) ON DELETE CASCADE,
+  FOREIGN KEY (categoria_id) REFERENCES Categoria(id),
   FOREIGN KEY (cuenta_origen_id) REFERENCES Cuenta(id),
-  FOREIGN KEY (cuenta_destino_id) REFERENCES Cuenta(id)
+  FOREIGN KEY (cuenta_destino_id) REFERENCES Cuenta(id),
+  CONSTRAINT chk_ingreso CHECK (
+    (tipo != 'Ingreso') OR (cuenta_origen_id IS NULL AND cuenta_destino_id IS NOT NULL AND categoria_id IS NOT NULL)
+  ),
+  CONSTRAINT chk_gasto CHECK (
+    (tipo != 'Gasto') OR (cuenta_origen_id IS NOT NULL AND cuenta_destino_id IS NULL AND categoria_id IS NOT NULL)
+  ),
+  CONSTRAINT chk_transferencia CHECK (
+    (tipo != 'Transferencia') OR (cuenta_origen_id IS NOT NULL AND cuenta_destino_id IS NOT NULL AND categoria_id IS NULL)
+  )
 );
 
 -- -----------------------------------------------------
