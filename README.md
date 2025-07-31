@@ -226,7 +226,7 @@ Aquí tienes un análisis profundo con posibles mejoras para "MoneyFluxTracker v
 
 #### **Mejora 4: Modelar Deudas y Activos de Inversión de Forma Detallada**
 
-*   **El "Porqué":** En tu descripción inicial mencionaste préstamos. Un préstamo es más que un simple gasto mensual (`la cuota de $181.000`). Es una deuda con un monto total, un saldo pendiente y, posiblemente, una tasa de interés. Lo mismo ocurrirá cuando empieces a invertir. Un activo tiene un valor que fluctúa. El esquema actual no captura esta complejidad.
+*   **El "Porqué":** Un préstamo es más que un simple gasto mensual (`la cuota de $181.000`). Es una deuda con un monto total, un saldo pendiente y, posiblemente, una tasa de interés. Lo mismo ocurrirá cuando empieces a invertir. Un activo tiene un valor que fluctúa. El esquema actual no captura esta complejidad.
 
 *   **La Implementación:**
     *   Crear una tabla `Deuda`:
@@ -288,3 +288,83 @@ SELECT * FROM Operacion WHERE usuario_id = ? ORDER BY fecha_hora DESC;
 - Menos tablas y lógica más simple.
 - Integridad garantizada por restricciones CHECK.
 
+¡Excelente! Documentar cada mejora de forma individual es una práctica fantástica que mantiene el proyecto ordenado.
+
+Aquí tienes la documentación detallada para la "Mejora #2", lista para ser integrada en tu archivo `README.md` o en tu wiki de proyecto.
+
+---
+
+### **Documentación de Mejora: Módulo de Operaciones Recurrentes (v1.6)**
+
+#### **ID de Mejora:** #2
+#### **Título:** Modelado Explícito y Automatización de Operaciones Recurrentes
+
+#### **1. Objetivo y Justificación (El "Porqué")**
+
+En las finanzas personales, una gran parte de los ingresos y gastos son predecibles y repetitivos (salarios, alquileres, suscripciones, cuotas de préstamos). La versión inicial de la base de datos permitía al usuario recibir recordatorios (`Recordatorio`), pero requería una acción manual para registrar la operación.
+
+El objetivo de esta mejora es **automatizar completamente el registro de estas operaciones periódicas**. Esto transforma la aplicación de una herramienta de registro pasiva a un asistente financiero proactivo, aportando tres beneficios clave:
+
+*   **Ahorro de Tiempo:** Elimina la necesidad de que el usuario introduzca los mismos datos mes a mes.
+*   **Reducción de Errores:** La automatización previene olvidos y errores de tipeo.
+*   **Planificación Financiera:** Permite realizar proyecciones de flujo de caja futuro con alta precisión, ya que el sistema "sabe" qué dinero entrará y saldrá.
+
+#### **2. Solución de Arquitectura (El "Cómo")**
+
+La solución se basa en el principio de **separación de responsabilidades**, distinguiendo entre *hechos* (operaciones que ya ocurrieron) y *reglas* (plantillas para operaciones futuras).
+
+Para ello, se introduce una nueva tabla en la base de datos:
+
+*   **`OperacionRecurrente`**: Esta tabla no almacena transacciones individuales, sino que funciona como una **"fábrica" o "plantilla"**. Cada fila define una regla para generar futuras operaciones.
+
+**Campos Clave de `OperacionRecurrente`:**
+
+*   **Información de la Plantilla:** (`tipo`, `monto`, `descripcion`, `categoria_id`, etc.): Definen *qué* operación se debe crear.
+*   **Reglas de Recurrencia:**
+    *   `frecuencia`: Define *cada cuánto* se debe ejecutar la regla (Diaria, Semanal, Mensual, etc.).
+    *   `fecha_inicio`: Indica a partir de cuándo la regla empieza a ser válida.
+    *   `fecha_proxima_ejecucion`: **El campo más importante.** Almacena la fecha exacta en la que se debe generar la próxima operación.
+    *   `fecha_fin`: Campo opcional que indica cuándo la recurrencia debe detenerse.
+    *   `activo`: Permite al usuario "pausar" o "reactivar" una operación recurrente sin borrar la regla.
+
+
+
+#### **3. Script SQL de Implementación**
+
+```sql
+-- Tabla que almacena las plantillas para las operaciones automáticas.
+CREATE TABLE IF NOT EXISTS OperacionRecurrente (
+  id INT PRIMARY KEY AUTO_INCREMENT,
+  usuario_id INT NOT NULL,
+  
+  -- Información de la plantilla (qué crear)
+  tipo ENUM('Ingreso', 'Gasto', 'Transferencia') NOT NULL,
+  monto DECIMAL(15, 2) NOT NULL,
+  descripcion TEXT NULL,
+  categoria_id INT NULL, 
+  cuenta_origen_id INT NULL, 
+  cuenta_destino_id INT NULL,
+  
+  -- Reglas de la recurrencia (cuándo crearlo)
+  frecuencia ENUM('Diaria', 'Semanal', 'Quincenal', 'Mensual', 'Anual') NOT NULL,
+  fecha_inicio DATETIME NOT NULL,
+  fecha_proxima_ejecucion DATETIME NOT NULL,
+  fecha_fin DATETIME NULL, -- NULL si es para siempre
+  activo BOOLEAN NOT NULL DEFAULT TRUE,
+
+  FOREIGN KEY (usuario_id) REFERENCES Usuario(id) ON DELETE CASCADE,
+  FOREIGN KEY (categoria_id) REFERENCES Categoria(id),
+  FOREIGN KEY (cuenta_origen_id) REFERENCES Cuenta(id),
+  FOREIGN KEY (cuenta_destino_id) REFERENCES Cuenta(id)
+);
+```
+
+#### **4. Beneficios para el Usuario**
+
+Desde la interfaz de la aplicación, esta estructura permite al usuario:
+
+*   Ver una lista clara de todos sus ingresos y gastos fijos.
+*   Crear, editar, pausar o eliminar cualquiera de estas reglas de forma sencilla.
+*   Tener la confianza de que su flujo financiero se mantiene actualizado automáticamente, reflejando una imagen fiel de su situación económica con un esfuerzo mínimo.
+
+![Diagrama entidad-relación de la base de datos](MFTDB-V1.png)
