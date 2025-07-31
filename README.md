@@ -36,6 +36,8 @@ La versión 1.0 está diseñada para ser funcional, coherente y robusta, aplican
 - **`Notificacion`**: Almacena mensajes generados por la aplicación para el usuario.
 - **`Recordatorio`**: Guarda recordatorios de eventos o pagos futuros.
 
+![Diagrama entidad-relación de la base de datos](MFTDB-V1.png)
+
 #### **2.3. Script SQL para Creación (v1.0)**
 
 Este es el script final y aprobado para la creación de la base de datos.
@@ -238,7 +240,7 @@ Aquí tienes un análisis profundo con posibles mejoras para "MoneyFluxTracker v
 
 
 
-## v1.5 - Unificación de Movimientos y Transacciones: Tabla `Operacion`
+## V2 - Unificación de Movimientos y Transacciones: Tabla `Operacion`
 
 ### **Resumen del Cambio**
 Se introduce la tabla central `Operacion`, que reemplaza a las tablas `Movimiento` y `Transaccion`.  
@@ -285,3 +287,4 @@ SELECT * FROM Operacion WHERE usuario_id = ? ORDER BY fecha_hora DESC;
 - Historial unificado y ordenado.
 - Menos tablas y lógica más simple.
 - Integridad garantizada por restricciones CHECK.
+

@@ -40,6 +40,7 @@ CREATE TABLE IF NOT EXISTS Categoria (
 );
 
 -- -----------------------------------------------------
+-- MEJORA 1 IMPLEMENTADA: Tabla Operacion
 -- Tabla Operacion (reemplaza Movimiento y Transaccion)
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS Operacion (
@@ -63,6 +64,46 @@ CREATE TABLE IF NOT EXISTS Operacion (
     (tipo != 'Gasto') OR (cuenta_origen_id IS NOT NULL AND cuenta_destino_id IS NULL AND categoria_id IS NOT NULL)
   ),
   CONSTRAINT chk_transferencia CHECK (
+    (tipo != 'Transferencia') OR (cuenta_origen_id IS NOT NULL AND cuenta_destino_id IS NOT NULL AND categoria_id IS NULL)
+  )
+);
+
+-- -----------------------------------------------------
+-- MEJORA 2 IMPLEMENTADA: Tabla OperacionRecurrente
+-- Esta tabla almacena las plantillas para las operaciones automáticas.
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS OperacionRecurrente (
+  id INT PRIMARY KEY AUTO_INCREMENT,
+  usuario_id INT NOT NULL,
+  
+  -- Información de la plantilla (qué crear)
+  tipo ENUM('Ingreso', 'Gasto', 'Transferencia') NOT NULL,
+  monto DECIMAL(15, 2) NOT NULL,
+  descripcion TEXT NULL,
+  categoria_id INT NULL, 
+  cuenta_origen_id INT NULL, 
+  cuenta_destino_id INT NULL,
+  
+  -- Reglas de la recurrencia (cuándo crearlo)
+  frecuencia ENUM('Diaria', 'Semanal', 'Quincenal', 'Mensual', 'Anual') NOT NULL,
+  fecha_inicio DATETIME NOT NULL,
+  fecha_proxima_ejecucion DATETIME NOT NULL,
+  fecha_fin DATETIME NULL, -- NULL si es para siempre
+  activo BOOLEAN NOT NULL DEFAULT TRUE,
+
+  FOREIGN KEY (usuario_id) REFERENCES Usuario(id) ON DELETE CASCADE,
+  FOREIGN KEY (categoria_id) REFERENCES Categoria(id),
+  FOREIGN KEY (cuenta_origen_id) REFERENCES Cuenta(id),
+  FOREIGN KEY (cuenta_destino_id) REFERENCES Cuenta(id),
+
+  -- Se pueden añadir las mismas restricciones CHECK que en la tabla Operacion
+  CONSTRAINT chk_recurrente_ingreso CHECK (
+    (tipo != 'Ingreso') OR (cuenta_origen_id IS NULL AND cuenta_destino_id IS NOT NULL AND categoria_id IS NOT NULL)
+  ),
+  CONSTRAINT chk_recurrente_gasto CHECK (
+    (tipo != 'Gasto') OR (cuenta_origen_id IS NOT NULL AND cuenta_destino_id IS NULL AND categoria_id IS NOT NULL)
+  ),
+  CONSTRAINT chk_recurrente_transferencia CHECK (
     (tipo != 'Transferencia') OR (cuenta_origen_id IS NOT NULL AND cuenta_destino_id IS NOT NULL AND categoria_id IS NULL)
   )
 );
