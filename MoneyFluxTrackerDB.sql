@@ -109,6 +109,29 @@ CREATE TABLE IF NOT EXISTS OperacionRecurrente (
 );
 
 -- -----------------------------------------------------
+-- MEJORA 3 IMPLEMENTADA: Tabla Presupuesto
+-- Almacena los límites de gasto por categoría y periodo.
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS Presupuesto (
+  id INT PRIMARY KEY AUTO_INCREMENT,
+  usuario_id INT NOT NULL,
+  
+  -- La regla del presupuesto
+  categoria_id INT NOT NULL,
+  monto_limite DECIMAL(15, 2) NOT NULL,
+  
+  -- El ciclo del presupuesto
+  periodo ENUM('Semanal', 'Quincenal', 'Mensual', 'Anual') NOT NULL DEFAULT 'Mensual',
+  fecha_inicio DATETIME NOT NULL,
+  activo BOOLEAN NOT NULL DEFAULT TRUE,
+
+  FOREIGN KEY (usuario_id) REFERENCES Usuario(id) ON DELETE CASCADE,
+  FOREIGN KEY (categoria_id) REFERENCES Categoria(id),
+  
+  -- Evita que un usuario cree dos presupuestos para la misma categoría en el mismo periodo
+  UNIQUE (usuario_id, categoria_id, periodo) 
+);
+-- -----------------------------------------------------
 -- Tabla Meta
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS Meta (

@@ -1,46 +1,70 @@
-### **Documentación del Proyecto: Base de Datos "MoneyFluxTracker" (MFT)**
+# Documentación del Proyecto: Base de Datos "MoneyFluxTracker" (MFT)
 
-**Versión del Documento:** 1.0
-**Fecha:** 27 de julio de 2025
-
-#### **1. Resumen del Proyecto**
-
-MoneyFluxTracker (MFT) es una aplicación de finanzas personales diseñada para proporcionar claridad, control y fomentar buenos hábitos financieros. El núcleo de la aplicación es una base de datos relacional robusta que registra ingresos, gastos, cuentas, metas de ahorro y recordatorios.
-
-Este documento detalla la estructura final de la base de datos en su versión 1.0 y describe una hoja de ruta con posibles mejoras y funcionalidades para futuras versiones.
+**Versión del Documento:** 1.0  
+**Fecha:** Semana 21 - 25 de julio de 2025
 
 ---
 
-### **2. Diseño de la Base de Datos (Versión 1.0)**
+## Tabla de Contenido
 
-La versión 1.0 está diseñada para ser funcional, coherente y robusta, aplicando las mejores prácticas de diseño para garantizar la integridad y la legibilidad de los datos.
+1. [Resumen](#1-resumen)
+2. [Diseño de la Base de Datos](#2-diseño-de-la-base-de-datos)
+    - [Principios de Diseño](#21-principios-de-diseño-aplicados)
+    - [Tablas](#22-tablas)
+    - [Diagrama ER](#diagrama-entidad-relacion)
+    - [Script SQL](#23-script-sql)
+3. [Mejoras Futuras](#3-mejoras-futuras)
+4. [Mejoras Implementadas](#mejoras-implementadas)
 
-#### **2.1. Principios de Diseño Aplicados**
 
-- **Normalización:** La estructura evita la redundancia de datos. La decisión clave fue eliminar el campo `tipo` de la tabla `Movimiento`, dejando a `Categoria` como la única fuente de verdad.
-- **Consistencia de Nomenclatura:** Todos los nombres de tablas y columnas están en español y siguen un patrón lógico (ej: `fecha_creacion`, `fecha_hora_limite`).
-- **Estandarización de Tipos de Dato:**
-  - **Finanzas:** Se utiliza `DECIMAL(15, 2)` para todos los campos monetarios, garantizando precisión.
-  - **Fechas:** Se utiliza `DATETIME` de forma estándar para registrar la fecha y la hora de todos los eventos.
-  - **Booleanos:** Se utiliza el tipo `BOOLEAN` para claridad semántica.
+---
 
-#### **2.2. Descripción Detallada de las Tablas**
+## 1. Resumen
 
-- **`Usuario`**: Almacena la información de los usuarios. Es la tabla central del sistema.
-- **`Cuenta`**: Registra las diferentes fuentes de dinero del usuario (efectivo, banco, cuenta digital).
-- **`Categoria`**: Clasifica los movimientos como 'Ingreso' o 'Gasto' con una etiqueta específica (Comida, Transporte, Salario).
-- **`Movimiento`**: Registra cada ingreso o gasto que afecta el saldo de una cuenta.
-- **`Transaccion`**: Registra las transferencias de dinero entre dos cuentas del mismo usuario. No altera el patrimonio neto.
-- **`Meta`**: Permite al usuario definir objetivos de ahorro con un monto y una fecha límite.
-- **`ProgresoMeta`**: Registra cada aporte individual realizado para alcanzar una meta.
-- **`Notificacion`**: Almacena mensajes generados por la aplicación para el usuario.
-- **`Recordatorio`**: Guarda recordatorios de eventos o pagos futuros.
+MoneyFluxTracker (MFT) es una aplicación de finanzas personales diseñada para proporcionar claridad, control y fomentar buenos hábitos financieros. El núcleo de la aplicación es una base de datos relacional robusta que registra ingresos, gastos, cuentas, metas de ahorro y recordatorios.
+
+
+
+---
+
+## 2. Diseño de la Base de Datos
+
+### 2.1. Principios de Diseño Aplicados
+
+- **Normalización:** Sin redundancia de datos; `Categoria` define el tipo de movimiento.
+- **Nomenclatura:** Tablas y columnas en español, con nombres lógicos.
+- **Tipos de Dato:**
+  - `DECIMAL(15,2)` para montos.
+  - `DATETIME` para fechas.
+  - `BOOLEAN` para valores lógicos.
+
+---
+
+### 2.2. Tablas
+
+- **Usuario:** Datos de usuario.
+- **Cuenta:** Fuentes de dinero (efectivo, banco, digital).
+- **Categoria:** Clasificación de movimientos.
+- **Movimiento:** Ingresos y gastos.
+- **Transaccion:** Transferencias entre cuentas.
+- **Meta:** Objetivos de ahorro.
+- **ProgresoMeta:** Aportes a metas.
+- **Notificacion:** Mensajes al usuario.
+- **Recordatorio:** Eventos o pagos futuros.
+
+---
+
+## Diagrama Entidad Relacion
 
 ![Diagrama entidad-relación de la base de datos](MFTDB-V1.png)
 
-#### **2.3. Script SQL para Creación (v1.0)**
+*Figura 1: Diagrama entidad-relación de la base de datos MFT.*
 
-Este es el script final y aprobado para la creación de la base de datos.
+---
+
+### 2.3. Script SQL
+
+Script para crear la base de datos y tablas principales.
 
 ```sql
 -- Creación de la base de datos si no existe
@@ -172,199 +196,87 @@ CREATE TABLE IF NOT EXISTS Recordatorio (
 
 ---
 
-### **3. Hoja de Ruta de Mejoras Futuras (v2.0 y Posteriores)**
+## 3. Mejoras Futuras
 
-De acuerdo. Dejando a un lado la optimización de rendimiento con índices, y partiendo de la base de que tu esquema actual es excelente y funcional, podemos enfocar el análisis en **posibles mejoras evolutivas**.
+- Unificación de movimientos y transacciones en una sola tabla (`Operacion`).
+- Automatización de operaciones recurrentes.
+- Sistema de presupuestos por categoría y periodo.
+- Modelado detallado de deudas y activos.
 
-Estas no son correcciones de errores (porque no los hay), sino **ideas para futuras versiones de tu aplicación** que añadirían funcionalidades más potentes y harían tu modelo aún más flexible y completo.
+---
+# Documentación del Proyecto: Base de Datos "MoneyFluxTracker" (MFT)
+**Versión del Documento:** 2.0  
+**Fecha:** semana del 28 de julio al 01 agosto de 2025
 
-Aquí tienes un análisis profundo con posibles mejoras para "MoneyFluxTracker v2.0":
+# Mejoras Implementadas 
+-
+
+### Mejora #1: Fusión de `Movimiento` y `Transaccion`
+
+**Objetivo:** Eliminar la redundancia y simplificar la lógica de la aplicación para consultar el historial financiero del usuario.
+
+**Implementación:**
+
+Las tablas `Movimiento` y `Transaccion` fueron **eliminadas** y reemplazadas por una única tabla central: **`Operacion`**.
+
+*   **Tabla `Operacion`**: Ahora registra cualquier tipo de actividad financiera.
+*   **Campo Discriminador `tipo`**: Una columna `ENUM('Ingreso', 'Gasto', 'Transferencia')` determina la naturaleza de cada registro.
+*   **Gestión de Cuentas**:
+    *   **Ingreso**: `cuenta_origen_id` es `NULL`, `cuenta_destino_id` tiene valor.
+    *   **Gasto**: `cuenta_origen_id` tiene valor, `cuenta_destino_id` es `NULL`.
+    *   **Transferencia**: `cuenta_origen_id` y `cuenta_destino_id` tienen valor.
+*   **Categorías**: El campo `categoria_id` es `NULL` para las transferencias, ya que estas no alteran el patrimonio.
+
+**Ventaja Principal:** Obtener un historial cronológico completo de toda la actividad del usuario ahora requiere una única y simple consulta a la tabla `Operacion`, en lugar de complejas uniones entre dos tablas.
 
 ---
 
-### **Análisis de Mejoras Potenciales (Evolución del Modelo)**
+### Mejora #2: Modelado de Operaciones Recurrentes
 
-#### **Mejora 1: Fusionar `Movimiento` y `Transaccion` en una tabla `Operacion`**
+**Objetivo:** Automatizar el registro de operaciones periódicas (salarios, suscripciones, etc.) para reducir la entrada manual de datos y permitir proyecciones financieras precisas.
 
-*   **El "Porqué":** Actualmente tienes una separación limpia entre movimientos (que alteran tu patrimonio) y transacciones (que solo mueven dinero entre cuentas). Esto es bueno, pero tiene una desventaja: si quieres ver un historial cronológico completo de *toda* tu actividad financiera (gastos, ingresos y transferencias), necesitas consultar dos tablas y unir los resultados. Una tabla unificada simplificaría drásticamente los reportes y la visualización de la línea de tiempo.
+**Implementación:**
 
-*   **La Implementación:**
-    *   Crear una única tabla llamada `Operacion`.
-    *   Añadir una columna `tipo ENUM('Ingreso', 'Gasto', 'Transferencia')`.
-    *   La tabla tendría `cuenta_id` (para ingresos/gastos) y `cuenta_destino_id` (que sería `NULL` para ingresos/gastos, pero contendría el ID de la cuenta de destino para las transferencias).
-    *   `categoria_id` sería `NULL` para las operaciones de tipo 'Transferencia'.
+Se introdujo una nueva tabla dedicada exclusivamente a gestionar las **reglas** de automatización, separándolas de los **hechos** ya ocurridos.
 
-*   **Ventaja:** Simplifica la lógica de la aplicación para obtener un "estado de cuenta" o historial unificado. Una sola consulta para obtener toda la actividad.
-
----
-
-#### **Mejora 2: Modelar Explícitamente los Movimientos Recurrentes**
-
-*   **El "Porqué":** Tu tabla `Recordatorio` es genial para alertarte de que debes hacer un pago. Sin embargo, no automatiza el registro. Las mejores apps financieras permiten definir gastos o ingresos fijos (el arriendo, el salario, la cuota de la moto) y los registran automáticamente cada mes. Esto es clave para desarrollar buenos hábitos y tener una previsión financiera real.
-
-*   **La Implementación:**
-    *   Crear una nueva tabla `MovimientoRecurrente`.
-    *   Campos: `id`, `usuario_id`, `cuenta_id`, `categoria_id`, `monto`, `descripcion`, `frecuencia ENUM('Diaria', 'Semanal', 'Quincenal', 'Mensual')`, `fecha_inicio`, `fecha_fin` (opcional).
-    *   Tu aplicación tendría un proceso (un "cron job" o tarea programada) que cada día revisa esta tabla y crea los registros correspondientes en la tabla `Movimiento`.
-
-*   **Ventaja:** Automatiza gran parte de la entrada de datos, reduce el error humano y permite hacer proyecciones de flujo de caja a futuro con gran precisión.
-
----
-
-#### **Mejora 3: Implementar un Sistema de Presupuestos (`Budgeting`)**
-
-*   **El "Porqué":** Las metas de ahorro (`Meta`) son para un objetivo específico. Pero para el control del día a día, la herramienta más poderosa es un presupuesto. Te permite definir un límite de gasto por categoría para un periodo (ej: "No gastar más de $300.000 en 'Comida' este mes"). Esto ataca directamente tu objetivo de "desarrollar buenos hábitos financieros".
-
-*   **La Implementación:**
-    *   Crear una nueva tabla `Presupuesto`.
-    *   Campos: `id`, `usuario_id`, `categoria_id` (para presupuestar por categoría), `monto_limite DECIMAL(15,2)`, `periodo ENUM('Semanal', 'Mensual', 'Anual')`, `fecha_inicio`.
-    *   La aplicación podría entonces mostrarte barras de progreso de tus presupuestos, comparando el total de gastos de una categoría contra el límite que estableciste.
-
-*   **Ventaja:** Transforma tu app de ser un simple rastreador de gastos a ser una herramienta proactiva de planificación y control financiero.
-
----
-
-#### **Mejora 4: Modelar Deudas y Activos de Inversión de Forma Detallada**
-
-*   **El "Porqué":** Un préstamo es más que un simple gasto mensual (`la cuota de $181.000`). Es una deuda con un monto total, un saldo pendiente y, posiblemente, una tasa de interés. Lo mismo ocurrirá cuando empieces a invertir. Un activo tiene un valor que fluctúa. El esquema actual no captura esta complejidad.
-
-*   **La Implementación:**
-    *   Crear una tabla `Deuda`:
-        *   Campos: `id`, `usuario_id`, `nombre` (ej: "Préstamo Moto"), `monto_total`, `saldo_pendiente`, `tasa_interes`, `fecha_adquisicion`. Cada pago en `Movimiento` reduciría el `saldo_pendiente`.
-    *   Crear una tabla `ActivoInversion`:
-        *   Campos: `id`, `usuario_id`, `nombre` (ej: "Acciones Ecopetrol"), `tipo` (ej: 'Acciones', 'Cripto'), `valor_compra`, `valor_actual`, `cantidad`.
-
-*   **Ventaja:** Permite calcular tu **patrimonio neto real** (Activos - Deudas), una métrica financiera fundamental. Prepara tu aplicación para tu objetivo a largo plazo de gestionar inversiones.
+*   **Tabla `OperacionRecurrente`**: Actúa como una **fábrica o plantilla** para generar operaciones futuras. Cada fila es una regla.
+*   **Campos Clave**:
+    *   **Plantilla**: Contiene los datos de la operación a crear (`monto`, `categoria_id`, etc.).
+    *   **Reglas de Recurrencia**:
+        *   `frecuencia`: Define cuándo se repite la operación (`Mensual`, `Semanal`, etc.).
+        *   `fecha_proxima_ejecucion`: Almacena la fecha exacta de la siguiente ejecución, siendo el campo clave para el proceso automático.
+        *   `activo`: Permite al usuario pausar o reanudar la recurrencia.
 
 
+**Ventaja Principal:** La aplicación puede mantener el estado financiero del usuario actualizado automáticamente, proporcionando una experiencia de usuario superior y datos fiables para la planificación futura.
 
+### Mejora #3: Modelado de presupuesto
 
+Un sistema de presupuestos  permite **planificar** 
 
-## V2 - Unificación de Movimientos y Transacciones: Tabla `Operacion`
+**"Este mes, decido gastar maximo $200.000 en salidas"**
 
-### **Resumen del Cambio**
-Se introduce la tabla central `Operacion`, que reemplaza a las tablas `Movimiento` y `Transaccion`.  
-Esto permite registrar todas las actividades financieras (ingresos, gastos y transferencias) en una sola tabla, facilitando la consulta y el análisis.
+**1. La Tabla `Presupuesto`**
 
-### **Estructura de la Tabla `Operacion`**
+Esta tabla es el corazón de la funcionalidad. Cada fila representa un límite de gasto que el usuario se impone a sí mismo.
+*   **¿Qué  guarda esta tabla?**
+    *   **A quién pertenece:** (FK a `Usuario`).
+    *   **Sobre qué se presupuesta:** (FK `Categoria`). para crear presupuestos con las categorias.
+    *   **Cuál es el límite:** `monto_limite`  valor máximo a gastar.
+    *   **Para qué periodo de tiempo:** `periodo` (un `ENUM`  'Semanal', 'Mensual', 'Anual'). 
+    *   **Desde cuándo empieza a contar:** `fecha_inicio` (`DATETIME`inicio del primer ciclo del presupuesto).
+    *   **¿Está activo?:** `activo` (un `BOOLEAN` para que el usuario pueda pausar un presupuesto sin borrarlo).
 
-| Campo              | Tipo                              | Descripción                                                                 |
-|--------------------|-----------------------------------|-----------------------------------------------------------------------------|
-| id                 | INT, PK, AUTO_INCREMENT           | Identificador único de la operación                                         |
-| usuario_id         | INT, FK                           | Usuario propietario de la operación                                         |
-| tipo               | ENUM('Ingreso','Gasto','Transferencia') | Tipo de operación                                                          |
-| monto              | DECIMAL(15,2)                     | Monto de la operación                                                      |
-| fecha_hora         | DATETIME                          | Fecha y hora de la operación                                               |
-| descripcion        | TEXT                              | Descripción opcional                                                       |
-| categoria_id       | INT, FK, NULLABLE                 | Categoría (solo para Ingreso y Gasto)                                      |
-| cuenta_origen_id   | INT, FK, NULLABLE                 | Cuenta de origen (ver reglas abajo)                                        |
-| cuenta_destino_id  | INT, FK, NULLABLE                 | Cuenta de destino (ver reglas abajo)                                       |
+**2. La Lógica del Backend (El Cerebro que Calcula)**
 
-### **Reglas según el tipo de operación**
+`GASTO REAL` vs. `LÍMITE DEL PRESUPUESTO`
 
-- **Ingreso:**  
-  - `cuenta_origen_id` = NULL  
-  - `cuenta_destino_id` = cuenta que recibe el dinero  
-  - `categoria_id` = obligatoria
+Para cada presupuesto activo de un usuario, el backend debe:
 
-- **Gasto:**  
-  - `cuenta_origen_id` = cuenta de la que sale el dinero  
-  - `cuenta_destino_id` = NULL  
-  - `categoria_id` = obligatoria
+*   **Paso A: Calcular el Gasto Real.**
+   
+*   **Paso B: Obtener el Límite del Presupuesto.**
 
-- **Transferencia:**  
-  - `cuenta_origen_id` = cuenta de origen  
-  - `cuenta_destino_id` = cuenta de destino  
-  - `categoria_id` = NULL
-
-### **Ejemplo de consulta para historial financiero**
-
-```sql
-SELECT * FROM Operacion WHERE usuario_id = ? ORDER BY fecha_hora DESC;
-```
-
-### **Ventajas de este modelo**
-- Historial unificado y ordenado.
-- Menos tablas y lógica más simple.
-- Integridad garantizada por restricciones CHECK.
-
-¡Excelente! Documentar cada mejora de forma individual es una práctica fantástica que mantiene el proyecto ordenado.
-
-Aquí tienes la documentación detallada para la "Mejora #2", lista para ser integrada en tu archivo `README.md` o en tu wiki de proyecto.
-
----
-
-### **Documentación de Mejora: Módulo de Operaciones Recurrentes (v1.6)**
-
-#### **ID de Mejora:** #2
-#### **Título:** Modelado Explícito y Automatización de Operaciones Recurrentes
-
-#### **1. Objetivo y Justificación (El "Porqué")**
-
-En las finanzas personales, una gran parte de los ingresos y gastos son predecibles y repetitivos (salarios, alquileres, suscripciones, cuotas de préstamos). La versión inicial de la base de datos permitía al usuario recibir recordatorios (`Recordatorio`), pero requería una acción manual para registrar la operación.
-
-El objetivo de esta mejora es **automatizar completamente el registro de estas operaciones periódicas**. Esto transforma la aplicación de una herramienta de registro pasiva a un asistente financiero proactivo, aportando tres beneficios clave:
-
-*   **Ahorro de Tiempo:** Elimina la necesidad de que el usuario introduzca los mismos datos mes a mes.
-*   **Reducción de Errores:** La automatización previene olvidos y errores de tipeo.
-*   **Planificación Financiera:** Permite realizar proyecciones de flujo de caja futuro con alta precisión, ya que el sistema "sabe" qué dinero entrará y saldrá.
-
-#### **2. Solución de Arquitectura (El "Cómo")**
-
-La solución se basa en el principio de **separación de responsabilidades**, distinguiendo entre *hechos* (operaciones que ya ocurrieron) y *reglas* (plantillas para operaciones futuras).
-
-Para ello, se introduce una nueva tabla en la base de datos:
-
-*   **`OperacionRecurrente`**: Esta tabla no almacena transacciones individuales, sino que funciona como una **"fábrica" o "plantilla"**. Cada fila define una regla para generar futuras operaciones.
-
-**Campos Clave de `OperacionRecurrente`:**
-
-*   **Información de la Plantilla:** (`tipo`, `monto`, `descripcion`, `categoria_id`, etc.): Definen *qué* operación se debe crear.
-*   **Reglas de Recurrencia:**
-    *   `frecuencia`: Define *cada cuánto* se debe ejecutar la regla (Diaria, Semanal, Mensual, etc.).
-    *   `fecha_inicio`: Indica a partir de cuándo la regla empieza a ser válida.
-    *   `fecha_proxima_ejecucion`: **El campo más importante.** Almacena la fecha exacta en la que se debe generar la próxima operación.
-    *   `fecha_fin`: Campo opcional que indica cuándo la recurrencia debe detenerse.
-    *   `activo`: Permite al usuario "pausar" o "reactivar" una operación recurrente sin borrar la regla.
-
-
-
-#### **3. Script SQL de Implementación**
-
-```sql
--- Tabla que almacena las plantillas para las operaciones automáticas.
-CREATE TABLE IF NOT EXISTS OperacionRecurrente (
-  id INT PRIMARY KEY AUTO_INCREMENT,
-  usuario_id INT NOT NULL,
-  
-  -- Información de la plantilla (qué crear)
-  tipo ENUM('Ingreso', 'Gasto', 'Transferencia') NOT NULL,
-  monto DECIMAL(15, 2) NOT NULL,
-  descripcion TEXT NULL,
-  categoria_id INT NULL, 
-  cuenta_origen_id INT NULL, 
-  cuenta_destino_id INT NULL,
-  
-  -- Reglas de la recurrencia (cuándo crearlo)
-  frecuencia ENUM('Diaria', 'Semanal', 'Quincenal', 'Mensual', 'Anual') NOT NULL,
-  fecha_inicio DATETIME NOT NULL,
-  fecha_proxima_ejecucion DATETIME NOT NULL,
-  fecha_fin DATETIME NULL, -- NULL si es para siempre
-  activo BOOLEAN NOT NULL DEFAULT TRUE,
-
-  FOREIGN KEY (usuario_id) REFERENCES Usuario(id) ON DELETE CASCADE,
-  FOREIGN KEY (categoria_id) REFERENCES Categoria(id),
-  FOREIGN KEY (cuenta_origen_id) REFERENCES Cuenta(id),
-  FOREIGN KEY (cuenta_destino_id) REFERENCES Cuenta(id)
-);
-```
-
-#### **4. Beneficios para el Usuario**
-
-Desde la interfaz de la aplicación, esta estructura permite al usuario:
-
-*   Ver una lista clara de todos sus ingresos y gastos fijos.
-*   Crear, editar, pausar o eliminar cualquiera de estas reglas de forma sencilla.
-*   Tener la confianza de que su flujo financiero se mantiene actualizado automáticamente, reflejando una imagen fiel de su situación económica con un esfuerzo mínimo.
-
-![Diagrama entidad-relación de la base de datos](MFTDB-V1.png)
+*   **Paso C: Calcular y Mostrar el Estado.**
+   
+**Nota:** se ha añadido una restricción `UNIQUE` al final para evitar que un usuario cree por error dos presupuestos mensuales para la misma categoría, lo que no tendría sentido.
