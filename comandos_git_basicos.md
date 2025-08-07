@@ -39,11 +39,72 @@ Muestra la lista de todos los commits realizados en el proyecto.
 
 ---
 
-## ¿Qué sigue después de los comandos básicos?
+# Uso de GitHub CLI (`gh`) para conectar y subir un proyecto local
 
-Ahora que dominas lo básico, estos son los siguientes conceptos clave para trabajar profesionalmente con Git:
+## Requisitos previos
+
+- Tener instalado Git en tu equipo.
+- Tener una cuenta en [GitHub](https://github.com).
+- Tener instalado GitHub CLI (`gh`).
+- Tener un proyecto local ya inicializado con Git y con commits realizados.
 
 ---
+
+## 1. Instalar GitHub CLI
+
+```bash
+choco install gh
+```
+
+Verifica la instalación:
+
+```bash
+gh --version
+```
+
+---
+
+## 2. Iniciar sesión en GitHub desde la terminal
+
+Ejecuta:
+
+```bash
+gh auth login
+```
+
+Verifica el estado de autenticación:
+
+```bash
+gh auth status
+```
+
+---
+
+## 3. Crear un repositorio en GitHub desde la terminal
+
+Desde la carpeta raíz de tu proyecto, ejecuta:
+
+```bash
+gh repo create
+
+---
+
+## 4. Verificar que todo esté correctamente enlazado
+
+Verifica que el repositorio remoto esté configurado:
+
+```bash
+git remote -v
+```
+
+Para abrir tu repositorio en el navegador:
+
+```bash
+gh repo view --web
+```
+
+---
+
 
 ### 1. Ramas (branches)
 
@@ -137,3 +198,12 @@ Cuando dos personas (o ramas) modifican la misma parte de un archivo, Git genera
 - Usa `.gitignore` para excluir archivos temporales o personales.
 - Sincroniza tu rama con frecuencia (`git pull`) para evitar conflictos grandes.
 - Borra ramas que ya no uses para mantener el repositorio limpio.
+
+## Recursos útiles
+
+- [Documentación oficial de GitHub CLI](https://cli.github.com/manual/)
+- [Documentación oficial de Git](https://git-scm.com/doc)
+- [GitHub Docs](https://docs.github.com/es)
+
+
+---
