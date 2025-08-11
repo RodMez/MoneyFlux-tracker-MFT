@@ -1,6 +1,5 @@
 # Documentación del Proyecto: Base de Datos "MoneyFluxTracker" (MFT)
 
-**Versión del Documento:** 1.0  
 **Fecha:** Semana 21 - 25 de julio de 2025
 
 ---
