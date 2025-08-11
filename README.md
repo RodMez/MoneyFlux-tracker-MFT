@@ -249,6 +249,9 @@ Se introdujo una nueva tabla dedicada exclusivamente a gestionar las **reglas** 
 
 **Ventaja Principal:** La aplicación puede mantener el estado financiero del usuario actualizado automáticamente, proporcionando una experiencia de usuario superior y datos fiables para la planificación futura.
 
+![Diagrama entidad-relación de la base de datos](MFTDB-V2.png)
+
+
 ### Mejora #3: Modelado de presupuesto
 
 Un sistema de presupuestos  permite **planificar** 
@@ -279,3 +282,5 @@ Para cada presupuesto activo de un usuario, el backend debe:
 *   **Paso C: Calcular y Mostrar el Estado.**
    
 **Nota:** se ha añadido una restricción `UNIQUE` al final para evitar que un usuario cree por error dos presupuestos mensuales para la misma categoría, lo que no tendría sentido.
+
+![Diagrama entidad-relación de la base de datos](MFTDB-V3.png)
