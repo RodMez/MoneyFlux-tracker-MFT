@@ -204,6 +204,4 @@ Cuando dos personas (o ramas) modifican la misma parte de un archivo, Git genera
 - [Documentación oficial de GitHub CLI](https://cli.github.com/manual/)
 - [Documentación oficial de Git](https://git-scm.com/doc)
 - [GitHub Docs](https://docs.github.com/es)
-
-
 ---

@@ -1,9 +1,7 @@
 -- Creación de la base de datos si no existe
 CREATE DATABASE IF NOT EXISTS MoneyFluxTrackerDB;
-
 -- Usar la base de datos
 USE MoneyFluxTrackerDB;
-
 -- -----------------------------------------------------
 -- Tabla Usuario
 -- -----------------------------------------------------
@@ -17,7 +15,6 @@ CREATE TABLE IF NOT EXISTS Usuario (
   fecha_ultimo_acceso DATETIME NULL,
   fecha_creacion DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
-
 -- -----------------------------------------------------
 -- Tabla Cuenta
 -- -----------------------------------------------------
@@ -29,7 +26,6 @@ CREATE TABLE IF NOT EXISTS Cuenta (
   tipo ENUM('Ahorro', 'Corriente', 'Efectivo', 'Digital') NOT NULL,
   FOREIGN KEY (usuario_id) REFERENCES Usuario(id) ON DELETE CASCADE
 );
-
 -- -----------------------------------------------------
 -- Tabla Categoria
 -- -----------------------------------------------------
@@ -38,7 +34,6 @@ CREATE TABLE IF NOT EXISTS Categoria (
   nombre VARCHAR(50) NOT NULL UNIQUE,
   tipo ENUM('Ingreso', 'Gasto') NOT NULL
 );
-
 -- -----------------------------------------------------
 -- MEJORA 1 IMPLEMENTADA: Tabla Operacion
 -- Tabla Operacion (reemplaza Movimiento y Transaccion)
@@ -67,7 +62,6 @@ CREATE TABLE IF NOT EXISTS Operacion (
     (tipo != 'Transferencia') OR (cuenta_origen_id IS NOT NULL AND cuenta_destino_id IS NOT NULL AND categoria_id IS NULL)
   )
 );
-
 -- -----------------------------------------------------
 -- MEJORA 2 IMPLEMENTADA: Tabla OperacionRecurrente
 -- Esta tabla almacena las plantillas para las operaciones automáticas.
@@ -107,7 +101,6 @@ CREATE TABLE IF NOT EXISTS OperacionRecurrente (
     (tipo != 'Transferencia') OR (cuenta_origen_id IS NOT NULL AND cuenta_destino_id IS NOT NULL AND categoria_id IS NULL)
   )
 );
-
 -- -----------------------------------------------------
 -- MEJORA 3 IMPLEMENTADA: Tabla Presupuesto
 -- Almacena los límites de gasto por categoría y periodo.
@@ -145,7 +138,6 @@ CREATE TABLE IF NOT EXISTS Meta (
   estado ENUM('En progreso', 'Completada', 'Pendiente') NOT NULL DEFAULT 'Pendiente',
   FOREIGN KEY (usuario_id) REFERENCES Usuario(id) ON DELETE CASCADE
 );
-
 -- -----------------------------------------------------
 -- Tabla ProgresoMeta
 -- -----------------------------------------------------
@@ -156,7 +148,6 @@ CREATE TABLE IF NOT EXISTS ProgresoMeta (
   aporte DECIMAL(15, 2) NOT NULL,
   FOREIGN KEY (meta_id) REFERENCES Meta(id) ON DELETE CASCADE
 );
-
 -- -----------------------------------------------------
 -- Tabla Notificacion
 -- -----------------------------------------------------
@@ -169,7 +160,6 @@ CREATE TABLE IF NOT EXISTS Notificacion (
   fecha_creacion DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
   FOREIGN KEY (usuario_id) REFERENCES Usuario(id) ON DELETE CASCADE
 );
-
 -- -----------------------------------------------------
 -- Tabla Recordatorio
 -- -----------------------------------------------------

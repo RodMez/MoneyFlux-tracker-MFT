@@ -1,4 +1,5 @@
-# Documentación del Proyecto: Base de Datos "MoneyFluxTracker" (MFT)
+
+# Documentación del Proyecto:  "MoneyFluxTracker" (MFT)
 
 **Fecha:** Semana 21 - 25 de julio de 2025
 
@@ -13,7 +14,10 @@
     - [Diagrama ER](#diagrama-entidad-relacion)
     - [Script SQL](#23-script-sql)
 3. [Mejoras Futuras](#3-mejoras-futuras)
-4. [Mejoras Implementadas](#mejoras-implementadas)
+4. [Mejoras Implementadas](#4-mejoras-implementadas)
+    - [Fusión de Movimiento y Transacción](#41-mejora-1-fusión-de-movimiento-y-transaccion)
+    - [Modelado de Operaciones Recurrentes](#42-mejora-2-modelado-de-operaciones-recurrentes)
+    - [Modelado de Presupuesto](#43-mejora-3-modelado-de-presupuesto)
 
 
 ---
@@ -203,14 +207,9 @@ CREATE TABLE IF NOT EXISTS Recordatorio (
 - Modelado detallado de deudas y activos.
 
 ---
-# Documentación del Proyecto: Base de Datos "MoneyFluxTracker" (MFT)
-**Versión del Documento:** 2.0  
-**Fecha:** semana del 28 de julio al 01 agosto de 2025
+## 4. Mejoras Implementadas
 
-# Mejoras Implementadas 
--
-
-### Mejora #1: Fusión de `Movimiento` y `Transaccion`
+### 4.1 Mejora #1: Fusión de `Movimiento` y `Transaccion`
 
 **Objetivo:** Eliminar la redundancia y simplificar la lógica de la aplicación para consultar el historial financiero del usuario.
 
@@ -230,7 +229,7 @@ Las tablas `Movimiento` y `Transaccion` fueron **eliminadas** y reemplazadas por
 
 ---
 
-### Mejora #2: Modelado de Operaciones Recurrentes
+### 4.2 Mejora #2: Modelado de Operaciones Recurrentes
 
 **Objetivo:** Automatizar el registro de operaciones periódicas (salarios, suscripciones, etc.) para reducir la entrada manual de datos y permitir proyecciones financieras precisas.
 
@@ -252,7 +251,7 @@ Se introdujo una nueva tabla dedicada exclusivamente a gestionar las **reglas** 
 ![Diagrama entidad-relación de la base de datos](MFTDB-V2.png)
 
 
-### Mejora #3: Modelado de presupuesto
+### 4.3 Mejora #3: Modelado de presupuesto
 
 Un sistema de presupuestos  permite **planificar** 
 
