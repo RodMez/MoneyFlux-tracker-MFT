@@ -59,7 +59,7 @@ MoneyFluxTracker (MFT) es una aplicación de finanzas personales diseñada para 
 
 ## Diagrama Entidad Relacion
 
-![Diagrama entidad-relación de la base de datos](MFTDB-V1.png)
+![Diagrama entidad-relación de la base de datos](/MFT-BD/MFTDB-V1.png)
 
 *Figura 1: Diagrama entidad-relación de la base de datos MFT.*
 
@@ -248,7 +248,7 @@ Se introdujo una nueva tabla dedicada exclusivamente a gestionar las **reglas** 
 
 **Ventaja Principal:** La aplicación puede mantener el estado financiero del usuario actualizado automáticamente, proporcionando una experiencia de usuario superior y datos fiables para la planificación futura.
 
-![Diagrama entidad-relación de la base de datos](MFTDB-V2.png)
+![Diagrama entidad-relación de la base de datos](/MFT-BD/MFTDB-V2.png)
 
 
 ### 4.3 Mejora #3: Modelado de presupuesto
@@ -282,4 +282,4 @@ Para cada presupuesto activo de un usuario, el backend debe:
    
 **Nota:** se ha añadido una restricción `UNIQUE` al final para evitar que un usuario cree por error dos presupuestos mensuales para la misma categoría, lo que no tendría sentido.
 
-![Diagrama entidad-relación de la base de datos](MFTDB-V3.png)
+![Diagrama entidad-relación de la base de datos](/MFT-BD/MFTDB-V3.png)
