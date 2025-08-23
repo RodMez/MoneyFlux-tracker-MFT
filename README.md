@@ -5,6 +5,7 @@
 
 ---
 
+
 ## Tabla de Contenido
 
 1. [Resumen](#1-resumen)
@@ -18,6 +19,18 @@
     - [Fusión de Movimiento y Transacción](#41-mejora-1-fusión-de-movimiento-y-transaccion)
     - [Modelado de Operaciones Recurrentes](#42-mejora-2-modelado-de-operaciones-recurrentes)
     - [Modelado de Presupuesto](#43-mejora-3-modelado-de-presupuesto)
+5. [Arquitectura y Estructura de Archivos del Backend (MFT-BACKEND)](#arquitectura-y-estructura-de-archivos-del-backend-mft-backend)
+    - [Introducción](#arquitectura-y-estructura-de-archivos-del-backend-mft-backend)
+    - [Estructura General](#2-estructura-general)
+    - [Desglose del Directorio app](#3-desglose-del-directorio-app)
+        - [app.py (Punto de Entrada)](#31-apppy-punto-de-entrada)
+        - [database.py](#32-databasepy)
+        - [dependencies.py](#33-dependenciespy)
+        - [Directorio core](#34-directorio-core)
+        - [Directorio models](#35-directorio-models)
+        - [Directorio schemas](#36-directorio-schemas)
+        - [Directorio crud](#37-directorio-crud)
+        - [Directorio routers](#38-directorio-routers)
 
 
 ---
@@ -158,3 +171,108 @@ Para cada presupuesto activo de un usuario, el backend debe:
 **Nota:** se ha añadido una restricción `UNIQUE` al final para evitar que un usuario cree por error dos presupuestos mensuales para la misma categoría, lo que no tendría sentido.
 
 ![Diagrama entidad-relación de la base de datos](/MFT-BD/MFTDB-V3.png)
+
+---
+
+**Consulta el script oficial y actualizado de la base de datos en:**
+[`MFT-BD/MoneyFluxTrackerDB.sql`](./MFT-BD/MoneyFluxTrackerDB.sql)
+
+
+---
+---
+# Arquitectura y Estructura de Archivos del Backend (MFT-BACKEND)
+
+
+Este documento detalla la estructura de directorios y archivos para el backend de la aplicación **MoneyFluxTracker (MFT)**. La arquitectura ha sido diseñada siguiendo los principios de **Separación de Conceptos (Separation of Concerns)**, escalabilidad y mantenibilidad.
+
+El objetivo es asegurar que cada componente del sistema tenga una única responsabilidad, facilitando el desarrollo, la depuración y la incorporación de nuevas funcionalidades en el futuro.
+
+## 2. Estructura General
+
+La siguiente es la estructura de directorios principal del proyecto backend.
+
+```
+MFT-BACKEND/
+├── .env                   # Archivo de variables de entorno (credenciales, secretos). NUNCA en Git.
+├── requirements.txt       # Lista de dependencias de Python para el proyecto.
+├── app/                   # Directorio principal que contiene toda la lógica de la aplicación.
+└── tests/                 # (Opcional) Contenedor para todas las pruebas automatizadas.
+```
+
+## 3. Desglose del Directorio `app/`
+
+La carpeta `app` es el corazón de nuestra aplicación FastAPI. Su estructura interna está diseñada para organizar la lógica de manera modular.
+
+```
+app/
+├── __init__.py
+├── app.py                 # Punto de entrada: crea la instancia de FastAPI y une los routers.
+├── database.py            # Configuración de la conexión a la BD con SQLAlchemy.
+├── dependencies.py        # Dependencias reutilizables (ej. get_db).
+│
+├── core/                  # Lógica y configuración del núcleo de la aplicación.
+│   └── config.py          # Carga y gestiona las variables de entorno.
+│
+├── models/                # Mapeo Objeto-Relacional (ORM) - Representación de las tablas de la BD.
+│   ├── usuario.py
+│   └── ...                # Un archivo por cada tabla de la base de datos.
+│
+├── schemas/               # Define la "forma" de los datos de la API (validación y serialización).
+│   ├── usuario.py
+│   └── ...                # Archivos de esquemas Pydantic correspondientes a los modelos.
+│
+├── crud/                  # Lógica de acceso a datos (Create, Read, Update, Delete).
+│   ├── crud_usuario.py
+│   └── ...                # Funciones que interactúan directamente con la BD.
+│
+└── routers/               # Endpoints o rutas de la API.
+    ├── autenticacion.py
+    ├── usuarios.py
+    └── ...                # Un archivo por cada grupo lógico de endpoints.
+```
+
+### 3.1. `app.py` (Punto de Entrada)
+
+*   **Responsabilidad:** Crear y configurar la instancia principal de `FastAPI`. Su tarea más importante es importar y registrar los diferentes módulos de `routers` para que los endpoints estén disponibles.
+
+### 3.2. `database.py`
+
+*   **Responsabilidad:** Contiene toda la configuración de SQLAlchemy.
+    *   Crea el `engine` de la base de datos a partir de la URL de conexión.
+    *   Define `SessionLocal` para gestionar las sesiones (conexiones) con la base de datos.
+    *   Define la `Base` declarativa de la cual heredarán todos nuestros modelos ORM.
+
+### 3.3. `dependencies.py`
+
+*   **Responsabilidad:** Almacenar funciones de dependencia reutilizables de FastAPI. El ejemplo principal es `get_db`, que gestiona el ciclo de vida de una sesión de base de datos por cada petición a la API. Futuras dependencias, como "obtener el usuario actualmente autenticado a partir de un token", también vivirán aquí.
+
+### 3.4. Directorio `core/`
+
+*   **Responsabilidad:** Contiene la configuración y la lógica fundamental que es transversal a toda la aplicación.
+*   `config.py`: Utiliza `pydantic-settings` para cargar las variables del archivo `.env` en un objeto de configuración fuertemente tipado.
+
+### 3.5. Directorio `models/`
+
+*   **Responsabilidad:** Representar las tablas de nuestra base de datos PostgreSQL como clases de Python.
+*   **Contenido:** Cada archivo (ej: `models/usuario.py`) define una clase que hereda de `Base` (definida en `database.py`) y describe las columnas y relaciones de una tabla. Esta es la capa del **ORM (Object-Relational Mapping)**.
+
+### 3.6. Directorio `schemas/`
+
+*   **Responsabilidad:** Definir la estructura de los datos que se reciben y envían a través de la API (generalmente en formato JSON).
+*   **Contenido:** Clases de Pydantic que FastAPI utiliza para:
+    1.  **Validar** los datos de las peticiones entrantes (ej: un `POST` para crear un usuario).
+    2.  **Serializar** los datos de las respuestas salientes (filtrando campos si es necesario).
+    3.  **Generar la documentación** automática de la API.
+
+### 3.7. Directorio `crud/`
+
+*   **Responsabilidad:** Abstraer y encapsular toda la lógica de interacción con la base de datos. Su nombre viene de **C**reate, **R**ead, **U**pdate, **D**elete.
+*   **Contenido:** Colección de funciones que reciben una sesión de la base de datos (`db: Session`) y los datos necesarios, y realizan las operaciones correspondientes (ej: `get_user_by_email`, `create_user_account`).
+*   **Beneficio:** Mantiene los `routers` limpios y centrados en la lógica HTTP, mientras que la lógica de la base de datos es reutilizable y fácil de probar.
+
+### 3.8. Directorio `routers/`
+
+*   **Responsabilidad:** Definir los endpoints de la API.
+*   **Contenido:** Cada archivo agrupa un conjunto de rutas relacionadas (ej: `routers/usuarios.py` contiene `/users/`, `/users/{id}`, etc.). Estos archivos utilizan las funciones del directorio `crud` para ejecutar las acciones y los `schemas` para definir los formatos de datos.
+
+---
